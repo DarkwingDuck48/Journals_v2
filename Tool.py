@@ -46,25 +46,45 @@ def acc3110101(sourceline):
     if len(sline) == 12:
         if sline[2] in ProdArr:                                                     # Line 2-8
             sline[0] = "3110001"
-            sline[7] = "[None]"
         elif sline[2] in PR_01_02_03_04 and sline[4] in MK_03:                      # Line 9-12
             sline[0] = "3110001"
-            sline[7] = "[None]"
-        elif sline == "PR_01" and sline[4] in MK_09:
-            if sline[7] in ["PP_02","PP_03","PP_04"]:                               # Line 18-20
-                sline[0] = "3110311"
-                sline[7] = "[None]"
-            else:                                                                   # Line 21-23
-                sline[0] = "3110124"
-                sline[7] = "[None]"
+        elif sline[2] in PR_01_02_03_04 and sline[4] in MK_09:                      # Line 18-41
+            if sline[7] in ["PP_02", "PP_03", "PP_04"]:
+                sline[0] = "3110111"
+            else:
+                if sline[2] == "PR_01":
+                    sline[0] = "3110124"
+                elif sline[2] in ["PR_02", "PR_03"]:
+                    sline[0] = "3110121"
+                elif sline[2] in PR_04:
+                    sline[0] = "3110122"
+        elif sline[2] in ["PR_15", "PR_19"]:                                       # Line 47, 49
+            sline[0] = "3110312"
+            sline[2] = "PR_01"
+        elif sline[2] == "PR_16":
+            sline[0] = "3110313"
+            sline[2] = "PR_02"
+        elif sline[2] in PR_18:
+            sline[0] = "3110402"
+            sline[2] = "PR_01"
+        sline[7] = "[None]"
 
     if len(sline) == 13:
         if sline[3] in ProdArr:
             sline[1] = "3110001"
-            sline[8] = "[None]"
-        elif sline[3] in PR_01_02_03_04 and sline[5] in MK_03:
+        elif sline[3] in PR_01_02_03_04 and sline[5] in MK_03:  # Line 9-12
             sline[1] = "3110001"
-            sline[8] = "[None]"
+        elif sline[3] in PR_01_02_03_04 and sline[5] in MK_09:
+            if sline[8] in ["PP_02", "PP_03", "PP_04"]:
+                sline[1] = "3110111"
+            else:
+                if sline[3] == "PR_01":
+                    sline[1] = "3110124"
+                elif sline[3] in ["PR_02", "PR_03"]:
+                    sline[1] = "3110121"
+                elif sline[3] in PR_04:
+                    sline[1] = "3110122"
+        sline[8] = "[None]"
     return ";".join(sline)+'\n'
 
 
