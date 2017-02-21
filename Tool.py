@@ -4,7 +4,7 @@ import time
 import shutil
 import re
 
-starttime = time.time()
+
 # Structures in HFM
 # MovProd
 PR_07 = ["PR_"+str(x) for x in range(28, 67) if x not in [28, 37, 42, 46, 53, 59]]
@@ -13,7 +13,7 @@ PR_08 = ["PR_09", "PR_10", "PR_11", "PR_12"]
 PR_14 = ["PR_15", "PR_16", "PR_19"]
 PR_18 = ["PR_21", "PR_22"]
 PR_13 = ["PR_23", "PR_24", "PR_25", "PR_26", "PR_27"]
-
+PR_01_02_03_04 = ["PR_01","PR_02","PR_03"] + PR_04
 # MktOvr
 MK_09 = ['[None]', 'MK_01', 'MK_02', 'MK_13', 'MK_14', 'MK_16', 'MK_17']
 MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
@@ -40,17 +40,42 @@ def convert (filename):
     return new
 
 
-def acc3110101(sline):
-    sline = ";".join(sline)
-    return "{0}  CONVERTED by acc3110101+\n".format(sline)
+def acc3110101(sourceline):
+    sline = sourceline
+    ProdArr = PR_07 + PR_08 + PR_13 + ['PR_20', 'PR_67', "PR_17", "[None]"]
+    if len(sline) == 12:
+        if sline[2] in ProdArr:                                                     # Line 2-8
+            sline[0] = "3110001"
+            sline[7] = "[None]"
+        elif sline[2] in PR_01_02_03_04 and sline[4] in MK_03:                      # Line 9-12
+            sline[0] = "3110001"
+            sline[7] = "[None]"
+        elif sline == "PR_01" and sline[4] in MK_09:
+            if sline[7] in ["PP_02","PP_03","PP_04"]:                               # Line 18-20
+                sline[0] = "3110311"
+                sline[7] = "[None]"
+            else:                                                                   # Line 21-23
+                sline[0] = "3110124"
+                sline[7] = "[None]"
+
+    if len(sline) == 13:
+        if sline[3] in ProdArr:
+            sline[1] = "3110001"
+            sline[8] = "[None]"
+        elif sline[3] in PR_01_02_03_04 and sline[5] in MK_03:
+            sline[1] = "3110001"
+            sline[8] = "[None]"
+    return ";".join(sline)+'\n'
 
 
-def acc1conv(sline):
+def acc1conv(sourceline):
+    sline = sourceline
     sline = ";".join(sline)
     return "{0}  CONVERTED by acc1conv+\n".format(sline)
 
 
-def acc2conv(sline):
+def acc2conv(sourceline):
+    sline = sourceline
     sline = ";".join(sline)
     return "{0}  CONVERTED by acc2conv+\n".format(sline)
 
@@ -64,7 +89,6 @@ with open("Mapping.json", "r", encoding="utf-8") as file:
 """
 sourcejournal = input("Enter name for source journal - ")+".jlf"
 sourcejournal = os.path.normpath(os.getcwd()+'//'+sourcejournal)
-print (sourcejournal)
 while not os.path.isfile(sourcejournal):
     print("Not file in directory with name " + sourcejournal)
     sourcejournal = input("Enter name for source joutnal - ")+".jlf"
@@ -76,7 +100,8 @@ convertedJournals = open(convertName, 'w', encoding="utf-8")
 log = open('logs.txt', 'w', encoding="utf-8")
 
 # Open converted into txt journal
-with open("GRSHFM_Journal.txt", 'r', encoding="utf-8") as journal:
+starttime = time.time()
+with open("testJournal.txt", 'r', encoding="utf-8") as journal:
     for line in journal:
         if line.isspace():
             convertedJournals.write(line)
