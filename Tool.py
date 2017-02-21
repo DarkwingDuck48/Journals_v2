@@ -4,10 +4,12 @@ import time
 import shutil
 import re
 
+# todo add function to mapping lines 59-87
+# todo create mappings for accounts from CR60
 
 # Structures in HFM
 # MovProd
-PR_07 = ["PR_"+str(x) for x in range(28, 67) if x not in [28, 37, 42, 46, 53, 59]]
+PR_07 = ["PR_" + str(x) for x in range(28, 67) if x not in [28, 37, 42, 46, 53, 59]]
 PR_04 = ["PR_05", "PR_06"]
 PR_08 = ["PR_09", "PR_10", "PR_11", "PR_12"]
 PR_14 = ["PR_15", "PR_16", "PR_19"]
@@ -22,11 +24,12 @@ MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
 acc1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
 acc2 = ["3110206", "3110207", "3110211", "3110212"]
 
+
 # End prepeared structures
 # In future, find another way to do this
 
 # Functions
-def convert (filename):
+def convert(filename):
     """
     Function for convert .jlf in .txt (UTF-8)
     :param filename: path to journal in .jlf format
@@ -47,14 +50,14 @@ def acc3110101(sourceline):
     :return: Mapped line as string
     """
     sline = sourceline
-    ProdArr = PR_07 + PR_08 + PR_13 + ['PR_20', 'PR_67', "PR_17", "[None]"]
+    prod_arr = PR_07 + PR_08 + PR_13 + ['PR_20', 'PR_67', "PR_17", "[None]"]
     PR_01020304 = ["PR_01", "PR_02", "PR_03"] + PR_04
     if len(sline) == 12:
-        if sline[2] in ProdArr:                                                     # Line 2-8
+        if sline[2] in prod_arr:  # Line 2-8
             sline[0] = "3110001"
-        elif sline[2] in PR_01020304 and sline[4] in MK_03:                         # Line 9-12
+        elif sline[2] in PR_01020304 and sline[4] in MK_03:  # Line 9-12
             sline[0] = "3110001"
-        elif sline[2] in PR_01020304 and sline[4] in MK09:                          # Line 18-41
+        elif sline[2] in PR_01020304 and sline[4] in MK09:  # Line 18-41
             if sline[7] in ["PP_02", "PP_03", "PP_04"]:
                 sline[0] = "3110111"
             else:
@@ -64,23 +67,23 @@ def acc3110101(sourceline):
                     sline[0] = "3110121"
                 elif sline[2] in PR_04:
                     sline[0] = "3110122"
-        elif sline[2] in ["PR_15", "PR_19"]:                                       # Line 47, 49
+        elif sline[2] in ["PR_15", "PR_19"]:  # Line 47, 49
             sline[0] = "3110312"
             sline[2] = "PR_01"
-        elif sline[2] == "PR_16":                                                  # Line 48
+        elif sline[2] == "PR_16":  # Line 48
             sline[0] = "3110313"
             sline[2] = "PR_02"
-        elif sline[2] in PR_18:                                                    # Line 54
+        elif sline[2] in PR_18:  # Line 54
             sline[0] = "3110402"
             sline[2] = "PR_01"
         sline[7] = "[None]"
 
     if len(sline) == 13:
-        if sline[3] in ProdArr:
+        if sline[3] in prod_arr:
             sline[1] = "3110001"
-        elif sline[3] in PR_01020304 and sline[5] in MK_03:                        # Line 9-12
+        elif sline[3] in PR_01020304 and sline[5] in MK_03:  # Line 9-12
             sline[1] = "3110001"
-        elif sline[3] in PR_01020304 and sline[5] in MK09:                         # Line 18-41
+        elif sline[3] in PR_01020304 and sline[5] in MK09:  # Line 18-41
             if sline[8] in ["PP_02", "PP_03", "PP_04"]:
                 sline[1] = "3110111"
             else:
@@ -90,18 +93,18 @@ def acc3110101(sourceline):
                     sline[1] = "3110121"
                 elif sline[3] in PR_04:
                     sline[1] = "3110122"
-        elif sline[3] in ["PR_15", "PR_19"]:                                       # Line 47, 49
+        elif sline[3] in ["PR_15", "PR_19"]:  # Line 47, 49
             sline[1] = "3110312"
             sline[3] = "PR_01"
-        elif sline[3] == "PR_16":                                                  # Line 48
+        elif sline[3] == "PR_16":  # Line 48
             sline[1] = "3110313"
             sline[3] = "PR_02"
-        elif sline[3] in PR_18:                                                    # Line 54
+        elif sline[3] in PR_18:  # Line 54
             sline[1] = "3110402"
             sline[3] = "PR_01"
         sline[8] = "[None]"
 
-    return ";".join(sline)+'\n'
+    return ";".join(sline) + '\n'
 
 
 def acc1conv(sourceline):
@@ -112,8 +115,8 @@ def acc1conv(sourceline):
     """
     sline = sourceline
     if len(sline) == 12:
-        if sline[4] in MK_03:                                                   # Line 13-17
-             sline[0] = "3110001"
+        if sline[4] in MK_03:  # Line 13-17
+            sline[0] = "3110001"
         else:
             if sline[0] == "3110201":
                 sline[0] = "3110122"
@@ -124,8 +127,8 @@ def acc1conv(sourceline):
         sline[7] = "[None]"
 
     elif len(sline) == 13:
-        if sline[5] in MK_03:                                                   # Line 13-17
-             sline[1] = "3110001"
+        if sline[5] in MK_03:  # Line 13-17
+            sline[1] = "3110001"
         else:
             if sline[1] == "3110201":
                 sline[1] = "3110122"
@@ -135,7 +138,7 @@ def acc1conv(sourceline):
                 sline[1] = "3110124"
         sline[8] = "[None]"
 
-    return ";".join(sline)+'\n'
+    return ";".join(sline) + '\n'
 
 
 def acc2conv(sourceline):
@@ -146,8 +149,8 @@ def acc2conv(sourceline):
     """
     sline = sourceline
     if len(sline) == 12:
-        if sline[0] == "3110206":                                               # Line 50-52
-            if sline[2] in ["PR_15","PR_19"]:
+        if sline[0] == "3110206":  # Line 50-52
+            if sline[2] in ["PR_15", "PR_19"]:
                 sline[0] = "3110312"
                 sline[2] = "PR_01"
             if sline[2] == "PR_16":
@@ -168,8 +171,8 @@ def acc2conv(sourceline):
             sline[2] = "PR_01"
         sline[7] = "[None]"
     if len(sline) == 13:
-        if sline[1] == "3110206":                                               # Line 50-52
-            if sline[3] in ["PR_15","PR_19"]:
+        if sline[1] == "3110206":  # Line 50-52
+            if sline[3] in ["PR_15", "PR_19"]:
                 sline[1] = "3110312"
                 sline[3] = "PR_01"
             if sline[3] == "PR_16":
@@ -189,7 +192,8 @@ def acc2conv(sourceline):
             sline[1] = "3110402"
             sline[3] = "PR_01"
         sline[8] = "[None]"
-    return ";".join(sline)+'\n'
+    return ";".join(sline) + '\n'
+
 
 # Read easy accounts
 """
@@ -207,7 +211,7 @@ while not os.path.isfile(sourcejournal):
 """
 
 # Create tagret file and log
-convertName = input("Enter name for converted file - ")+'.txt'
+convertName = input("Enter name for converted file - ") + '.txt'
 convertedJournals = open(convertName, 'w', encoding="utf-8")
 log = open('logs.txt', 'w', encoding="utf-8")
 
@@ -242,7 +246,3 @@ convertedJournals.close()
 log.close()
 
 print("Done! Time is - {:.3f}".format(time.time() - starttime))
-
-
-
-
