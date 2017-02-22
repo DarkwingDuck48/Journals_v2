@@ -2,10 +2,7 @@ import json
 import os, os.path
 import time
 import shutil
-import re
 
-# todo add function to mapping lines 59-87
-# todo create mappings for accounts from CR60
 
 # Structures in HFM
 # MovProd
@@ -24,10 +21,34 @@ MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
 acclist1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
 acclist2 = ["3110206", "3110207", "3110211", "3110212"]
 acccostlist = ["4111002", "4111003", "4111099", "4112002", "4112003", "4120301", "4120302", "4120102", "4120107"]
-
-
+acclist3 = ["4110105", "4110101", "4120101", "4110107"]
+accCR60 = {"4350301", "4350302",
+           "4350601", "4350602", "4350603", "4350604",
+           "4350701", "4350702", "4350703", "4350704", "4350705", "4350706",
+           "4350801", "4350802", "4350803", "4350804", "4350805",
+           "4324103", "4324107", "4324108",
+           "4350901",
+           "4351001", "4351002", "4351003", "4351004", "4351051", "4351052", "4351053",
+           "4351211", "4351212", "4351213", "4351202", "4351203", "4351204", "4351207", "4351208",
+           "4351251", "4351252", "4351253",
+           "4324105", "4350102", "4341101", "4341102",
+           "4315101", "4311101", "4311102", "4311103", "4311104",
+           "4312101", "4312102", "4312131", "4312132", "4312133", "4312104", "4312105", "4312106", "4312107",
+           "4313101", "4314101", "4314102", "4314103", "4314104", "4314105", "4314106",
+           "4311103", "4351101", "4351102",
+           "4350521", "4350522", "4350523", "4350524", "4350525",
+           "4350401", "4350402", "4350406", "4350403", "4350404", "4350405",
+           "4350501", "4350503",
+           "4350201", "4350202", "4350203",
+           "4110102", "4110201", "4110202", "4110202", "4110203", "4110204", "4110299", "4110103", "4110104",
+           "4350111", "4350112", "4350113",
+           "4360101", "4360102", "4360103", "4360104", "4360105",
+           "4360201", "4360202", "4360203", "4360204", "4360205",
+           "4360301", "4360302", "4360303", "4360304", "4360305"
+           }
 # End prepeared structures
 # In future, find another way to do this
+
 
 # Functions
 def convert(filename):
@@ -38,6 +59,7 @@ def convert(filename):
     """
     # Разделяем путь и имя файла
     (path, source_name) = os.path.split(filename)
+    target_name = ''
     if source_name[-3:] == "jlf":
         target_name = source_name[:-3] + "txt"
     elif source_name[-3:] == "txt":
@@ -252,29 +274,55 @@ def cost(sourceline):
     return ";".join(sline) + "\n"
 
 
-# Read easy accounts
-"""
-with open("Mapping.json", "r", encoding="utf-8") as file:
-    alldict = json.load(file)
-    mappings = alldict["Mappings"]
-"""
+def acc3conv(sourceline):
+    sline = sourceline
+    pr = PR_18 + ["PR_15", "PR_19"]
+    if len(sline) == 12:  # Lines 74-87
+        if sline[0] == "4120101":
+            sline[0] = "4110101"
+        if sline[2] in pr:
+            sline[2] = "PR_01"
+        elif sline[2] == "PR_16":
+            sline[2] = "PR_02"
+    if len(sline) == 13:
+        if sline[1] == "4120101":
+            sline[1] = "4110101"
+        if sline[3] in pr:
+            sline[3] = "PR_01"
+        elif sline[3] == "PR_16":
+            sline[3] = "PR_02"
+    return ";".join(sline) + "\n"
+
+
+def acccr60(sourceline):
+    sline = sourceline
+    if len(sline) == 12:
+        if sline[7] == "[None]":
+            sline[7] = "CC10"
+    elif len(sline) == 13:
+        if sline[8] == "[None]":
+            sline[8] = "CC10"
+    return ";".join(sline)+"\n"
+
 # Get name Journal and check name
-"""
+
 sourcejournal = input("Enter name for source journal - ")+".jlf"
-sourcejournal = os.path.normpath(os.getcwd()+'//'+sourcejournal)
 while not os.path.isfile(sourcejournal):
     print("Not file in directory with name " + sourcejournal)
     sourcejournal = input("Enter name for source joutnal - ")+".jlf"
-"""
+sourcejournal = os.path.normpath(os.getcwd() + '//' + sourcejournal)
+sourceconverted = convert(sourcejournal)
 
 # Create tagret file and log
 convertName = input("Enter name for converted file - ") + '.txt'
+convertPath = os.path.normpath(os.getcwd() + '//' + convertName)
+
 convertedJournals = open(convertName, 'w', encoding="utf-8")
 log = open('logs.txt', 'w', encoding="utf-8")
 
 # Open converted into txt journal
 starttime = time.time()
-with open("GRSHFM_Journal.txt", 'r', encoding="utf-8") as journal:
+with open(sourceconverted, 'r', encoding="utf-8") as journal:
     for line in journal:
         if line.isspace():
             convertedJournals.write(line)
@@ -293,6 +341,10 @@ with open("GRSHFM_Journal.txt", 'r', encoding="utf-8") as journal:
                     line = acc2conv(splline)
                 elif splline[0] in acccostlist:
                     line = cost(splline)
+                elif splline[0] in acclist3:
+                    line = acc3conv(splline)
+                elif splline[0] in accCR60:
+                    line = acccr60(splline)
             elif not splline[0].isdigit():
                 if splline[1] == "3110101":
                     line = acc3110101(splline)
@@ -302,8 +354,16 @@ with open("GRSHFM_Journal.txt", 'r', encoding="utf-8") as journal:
                     line = acc2conv(splline)
                 elif splline[1] in acccostlist:
                     line = cost(splline)
+                elif splline[1] in acclist3:
+                    line = acc3conv(splline)
+                elif splline[1] in accCR60:
+                    line = acccr60(splline)
             convertedJournals.write(line)  # Write line to target .txt file
 convertedJournals.close()
+targetJournal = convert(convertPath)
+if os.path.isfile(targetJournal):
+    os.remove(convertPath)
+os.remove(sourceconverted)
 log.close()
 
 print("Done! Time is - {:.3f}".format(time.time() - starttime))
