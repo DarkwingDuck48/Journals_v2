@@ -226,7 +226,7 @@ def cost(sourceline):
     if len(sline) == 12:
         if sline[0] in ["4111002", "4111003"] and sline[2] in PR_18:  # Line 59-60
             sline[2] = "PR_01"
-        elif sline[0] == "4111009" and sline[2] in PR_18:  # Line 61
+        elif sline[0] == "4111099" and sline[2] in PR_18:  # Line 61
             sline[0] = "4111003"
             sline[2] = "PR_05"
         elif sline[0] == "4112002" and sline[2] == "PR_15":  # Line 62
