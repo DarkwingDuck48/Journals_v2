@@ -1,8 +1,7 @@
-import json
-import os, os.path
-import time
+import os
+import os.path
 import shutil
-
+import time
 
 # Structures in HFM
 # MovProd
@@ -20,7 +19,8 @@ MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
 # Accounts
 acclist1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
 acclist2 = ["3110206", "3110207", "3110211", "3110212"]
-acccostlist = ["4111002", "4111003", "4111099", "4112002", "4112003", "4120301", "4120302", "4120102", "4120107"]
+acccostlist = ["4111002", "4111003", "4111099", "4112002", "4112003", "4120301", "4120302", "4120102", "4120106",
+               "4120107"]
 acclist3 = ["4110105", "4110101", "4120101", "4110107"]
 accCR60 = {"4350301", "4350302",
            "4350601", "4350602", "4350603", "4350604",
@@ -78,57 +78,40 @@ def acc3110101(sourceline):
     sline = sourceline
     prod_arr = PR_07 + PR_08 + PR_13 + ['PR_20', 'PR_67', "PR_17", "[None]"]
     PR_01020304 = ["PR_01", "PR_02", "PR_03"] + PR_04
-    if len(sline) == 12:
-        if sline[2] in prod_arr:  # Line 2-8
-            sline[0] = "3110001"
-        elif sline[2] in PR_01020304 and sline[4] in MK_03:  # Line 9-12
-            sline[0] = "3110001"
-        elif sline[2] in PR_01020304 and sline[4] in MK09:  # Line 18-41
-            if sline[7] in ["PP_02", "PP_03", "PP_04"]:
-                sline[0] = "3110111"
-            else:
-                if sline[2] == "PR_01":
-                    sline[0] = "3110124"
-                elif sline[2] in ["PR_02", "PR_03"]:
-                    sline[0] = "3110121"
-                elif sline[2] in PR_04:
-                    sline[0] = "3110122"
-        elif sline[2] in ["PR_15", "PR_19"]:  # Line 47, 49
-            sline[0] = "3110312"
-            sline[2] = "PR_01"
-        elif sline[2] == "PR_16":  # Line 48
-            sline[0] = "3110313"
-            sline[2] = "PR_02"
-        elif sline[2] in PR_18:  # Line 54
-            sline[0] = "3110402"
-            sline[2] = "PR_01"
-        sline[7] = "[None]"
-
+    # index of dimensions
+    prod_i = 2
+    acc_i = 0
+    mkt_i = 4
+    cost_i = 7
     if len(sline) == 13:
-        if sline[3] in prod_arr:
-            sline[1] = "3110001"
-        elif sline[3] in PR_01020304 and sline[5] in MK_03:  # Line 9-12
-            sline[1] = "3110001"
-        elif sline[3] in PR_01020304 and sline[5] in MK09:  # Line 18-41
-            if sline[8] in ["PP_02", "PP_03", "PP_04"]:
-                sline[1] = "3110111"
-            else:
-                if sline[3] == "PR_01":
-                    sline[1] = "3110124"
-                elif sline[3] in ["PR_02", "PR_03"]:
-                    sline[1] = "3110121"
-                elif sline[3] in PR_04:
-                    sline[1] = "3110122"
-        elif sline[3] in ["PR_15", "PR_19"]:  # Line 47, 49
-            sline[1] = "3110312"
-            sline[3] = "PR_01"
-        elif sline[3] == "PR_16":  # Line 48
-            sline[1] = "3110313"
-            sline[3] = "PR_02"
-        elif sline[3] in PR_18:  # Line 54
-            sline[1] = "3110402"
-            sline[3] = "PR_01"
-        sline[8] = "[None]"
+        prod_i = 3
+        acc_i = 1
+        mkt_i = 5
+        cost_i = 8
+    if sline[prod_i] in prod_arr:  # Line 2-8
+            sline[acc_i] = "3110001"
+    elif sline[prod_i] in PR_01020304 and sline[mkt_i] in MK_03:  # Line 9-12
+            sline[acc_i] = "3110001"
+    elif sline[prod_i] in PR_01020304 and sline[mkt_i] in MK09:  # Line 18-41
+        if sline[cost_i] in ["PP_02", "PP_03", "PP_04"]:
+            sline[acc_i] = "3110111"
+        else:
+            if sline[prod_i] == "PR_01":
+                sline[acc_i] = "3110124"
+            elif sline[prod_i] in ["PR_02", "PR_03"]:
+                sline[acc_i] = "3110121"
+            elif sline[prod_i] in PR_04:
+                sline[acc_i] = "3110122"
+    elif sline[prod_i] in ["PR_15", "PR_19"]:  # Line 47, 49
+        sline[acc_i] = "3110312"
+        sline[prod_i] = "PR_01"
+    elif sline[prod_i] == "PR_16":  # Line 48
+        sline[acc_i] = "3110313"
+        sline[prod_i] = "PR_02"
+    elif sline[prod_i] in PR_18:  # Line 54
+        sline[acc_i] = "3110402"
+        sline[prod_i] = "PR_01"
+    sline[cost_i] = "[None]"
 
     return ";".join(sline) + '\n'
 
@@ -250,7 +233,7 @@ def cost(sourceline):
     elif len(sline) == 13:
         if sline[1] in ["4111002", "4111003"] and sline[3] in PR_18:  # Line 59-60
             sline[3] = "PR_01"
-        elif sline[1] == "4111009" and sline[3] in PR_18:  # Line 61
+        elif sline[1] == "4111099" and sline[3] in PR_18:  # Line 61
             sline[1] = "4111003"
             sline[3] = "PR_05"
         elif sline[1] == "4112002" and sline[3] == "PR_15":  # Line 62
