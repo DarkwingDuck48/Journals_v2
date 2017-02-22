@@ -21,8 +21,9 @@ MK09 = ['[None]', 'MK_01', 'MK_02', 'MK_13', 'MK_14', 'MK_16', 'MK_17']
 MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
 
 # Accounts
-acc1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
-acc2 = ["3110206", "3110207", "3110211", "3110212"]
+acclist1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
+acclist2 = ["3110206", "3110207", "3110211", "3110212"]
+acccostlist = ["4111002", "4111003", "4111099", "4112002", "4112003", "4120301", "4120302", "4120102", "4120107"]
 
 
 # End prepeared structures
@@ -31,21 +32,24 @@ acc2 = ["3110206", "3110207", "3110211", "3110212"]
 # Functions
 def convert(filename):
     """
-    Function for convert .jlf in .txt (UTF-8)
-    :param filename: path to journal in .jlf format
-    :return: path to journal in .txt format
+    Function for convert .jlf in .txt (UTF-8) or .txt to .jlf. Target file will be a copy of source with new format
+    :param filename: path to journal in .jlf or .txt format
+    :return: path to journal in .txt or .jlf format
     """
     # Разделяем путь и имя файла
-    (path, jlf_name) = os.path.split(filename)
-    txt_name = jlf_name[:-3] + "txt"
-    new = os.path.join(path, txt_name)
+    (path, source_name) = os.path.split(filename)
+    if source_name[-3:] == "jlf":
+        target_name = source_name[:-3] + "txt"
+    elif source_name[-3:] == "txt":
+        target_name = source_name[:-3] + "jlf"
+    new = os.path.join(path, target_name)
     shutil.copy(filename, new)
     return new
 
 
 def acc3110101(sourceline):
     """
-
+    Function for mapping lines with account 3110101
     :param sourceline: Line from journal with account 3110101
     :return: Mapped line as string
     """
@@ -109,7 +113,7 @@ def acc3110101(sourceline):
 
 def acc1conv(sourceline):
     """
-
+    Function for mapping lines with accounts "3110201", "3110202", "3110203", "3110204", "3110205"
     :param sourceline: Line from journal with accounts "3110201", "3110202", "3110203", "3110204", "3110205"
     :return: Mapped line as string
     """
@@ -143,7 +147,7 @@ def acc1conv(sourceline):
 
 def acc2conv(sourceline):
     """
-
+    Function for mapping lines with accounts "3110206", "3110207", "3110211", "3110212"
     :param sourceline: Line from journal with accounts "3110206", "3110207", "3110211", "3110212"
     :return: Mappend line as string
     """
@@ -195,6 +199,59 @@ def acc2conv(sourceline):
     return ";".join(sline) + '\n'
 
 
+def cost(sourceline):
+    sline = sourceline
+    if len(sline) == 12:
+        if sline[0] in ["4111002", "4111003"] and sline[2] in PR_18:  # Line 59-60
+            sline[2] = "PR_01"
+        elif sline[0] == "4111009" and sline[2] in PR_18:  # Line 61
+            sline[0] = "4111003"
+            sline[2] = "PR_05"
+        elif sline[0] == "4112002" and sline[2] == "PR_15":  # Line 62
+            sline[2] = "PR_01"
+        elif sline[0] == "4112003":
+            if sline[2] in ["PR_15", "PR_19"]:  # Line 63, 65
+                sline[2] = "PR_01"
+            elif sline[2] == "PR_16":  # Line 64
+                sline[0] = "4112004"
+                sline[2] = "PR_02"
+        elif sline[0] == "4120301" and sline[2] in PR_18:  # Line 66
+            sline[0] = "4111002"
+            sline[2] = "PR_01"
+        elif sline[0] == "4120302" and sline[2] in PR_18:  # Line 67
+            sline[0] = "4111003"
+            sline[2] = "PR_01"
+        elif sline[0] == "4120106":  # Line 69
+            sline[0] = "4110106"
+        elif sline[0] == "4120107":  # Line 70
+            sline[0] = "4110107"
+    elif len(sline) == 13:
+        if sline[1] in ["4111002", "4111003"] and sline[3] in PR_18:  # Line 59-60
+            sline[3] = "PR_01"
+        elif sline[1] == "4111009" and sline[3] in PR_18:  # Line 61
+            sline[1] = "4111003"
+            sline[3] = "PR_05"
+        elif sline[1] == "4112002" and sline[3] == "PR_15":  # Line 62
+            sline[3] = "PR_01"
+        elif sline[1] == "4112003":
+            if sline[3] in ["PR_15", "PR_19"]:  # Line 63, 65
+                sline[3] = "PR_01"
+            elif sline[3] == "PR_16":  # Line 64
+                sline[1] = "4112004"
+                sline[3] = "PR_02"
+        elif sline[1] == "4120301" and sline[3] in PR_18:  # Line 66
+            sline[1] = "4111002"
+            sline[3] = "PR_01"
+        elif sline[1] == "4120302" and sline[3] in PR_18:  # Line 67
+            sline[1] = "4111003"
+            sline[3] = "PR_01"
+        elif sline[1] == "4120106":  # Line 69
+            sline[1] = "4110106"
+        elif sline[1] == "4120107":  # Line 70
+            sline[1] = "4110107"
+    return ";".join(sline) + "\n"
+
+
 # Read easy accounts
 """
 with open("Mapping.json", "r", encoding="utf-8") as file:
@@ -230,18 +287,22 @@ with open("GRSHFM_Journal.txt", 'r', encoding="utf-8") as journal:
             if splline[0].isdigit():
                 if splline[0] == "3110101":
                     line = acc3110101(splline)
-                elif splline[0] in acc1:
+                elif splline[0] in acclist1:
                     line = acc1conv(splline)
-                elif splline[0] in acc2:
+                elif splline[0] in acclist2:
                     line = acc2conv(splline)
+                elif splline[0] in acccostlist:
+                    line = cost(splline)
             elif not splline[0].isdigit():
                 if splline[1] == "3110101":
                     line = acc3110101(splline)
-                elif splline[1] in acc1:
+                elif splline[1] in acclist1:
                     line = acc1conv(splline)
-                elif splline[1] in acc2:
+                elif splline[1] in acclist2:
                     line = acc2conv(splline)
-            convertedJournals.write(line)
+                elif splline[1] in acccostlist:
+                    line = cost(splline)
+            convertedJournals.write(line)  # Write line to target .txt file
 convertedJournals.close()
 log.close()
 
