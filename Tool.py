@@ -89,6 +89,7 @@ def acc3110101(sourceline):
         acc_i = 1
         mkt_i = 5
         cost_i = 8
+
     if sline[prod_i] in prod_arr:  # Line 2-8
             sline[acc_i] = "3110001"
     elif sline[prod_i] in PR_01020304070813 and sline[mkt_i] in MK_03:  # Line 9-12
@@ -131,17 +132,17 @@ def acc1conv(sourceline):
         mkt_i = 5
         acc_i = 1
         cost_i = 8
-    if len(sline) == 12:
-        if sline[mkt_i] in MK_03:  # Line 13-17
-            sline[acc_i] = "3110001"
+
+    if sline[mkt_i] in MK_03:  # Line 13-17
+        sline[acc_i] = "3110001"
+    else:
+        if sline[acc_i] == "3110201":
+            sline[acc_i] = "3110122"
+        elif sline[acc_i] == "3110204":
+            sline[acc_i] = "3110125"
         else:
-            if sline[acc_i] == "3110201":
-                sline[acc_i] = "3110122"
-            elif sline[acc_i] == "3110204":
-                sline[acc_i] = "3110125"
-            else:
-                sline[acc_i] = "3110124"
-        sline[cost_i] = "[None]"
+            sline[acc_i] = "3110124"
+    sline[cost_i] = "[None]"
     return ";".join(sline) + '\n'
 
 
@@ -152,103 +153,71 @@ def acc2conv(sourceline):
     :return: Mappend line as string
     """
     sline = sourceline
-    if len(sline) == 12:
-        if sline[0] == "3110206":  # Line 50-52
-            if sline[2] in ["PR_15", "PR_19"]:
-                sline[0] = "3110312"
-                sline[2] = "PR_01"
-            if sline[2] == "PR_16":
-                sline[0] = "3110313"
-                sline[2] = "PR_02"
-        elif sline[0] == "3110207":
-            if sline[2] == "PR_15":
-                sline[0] = "3110311"
-                sline[2] = "PR_01"
-            elif sline[2] in PR_18:
-                sline[0] = "3110402"
-                sline[2] = "PR_05"
-        elif sline[0] == "3110211" and sline[2] in PR_18:
-            sline[0] = "3110401"
-            sline[2] = "PR_01"
-        elif sline[0] == "3110212" and sline[2] in PR_18:
-            sline[0] = "3110402"
-            sline[2] = "PR_01"
-        sline[7] = "[None]"
+    acc_i = 0
+    prod_i = 2
+    cost_i = 7
+
     if len(sline) == 13:
-        if sline[1] == "3110206":  # Line 50-52
-            if sline[3] in ["PR_15", "PR_19"]:
-                sline[1] = "3110312"
-                sline[3] = "PR_01"
-            if sline[3] == "PR_16":
-                sline[1] = "3110313"
-                sline[3] = "PR_02"
-        elif sline[1] == "3110207":
-            if sline[3] == "PR_15":
-                sline[1] = "3110311"
-                sline[3] = "PR_01"
-            elif sline[3] in PR_18:
-                sline[1] = "3110402"
-                sline[3] = "PR_05"
-        elif sline[1] == "3110211" and sline[3] in PR_18:
-            sline[1] = "3110401"
-            sline[3] = "PR_01"
-        elif sline[1] == "3110212" and sline[3] in PR_18:
-            sline[1] = "3110402"
-            sline[3] = "PR_01"
-        sline[8] = "[None]"
+        acc_i = 1
+        prod_i = 3
+        cost_i = 8
+
+    if sline[acc_i] == "3110206":  # Line 50-52
+        if sline[prod_i] in ["PR_15", "PR_19"]:
+            sline[acc_i] = "3110312"
+            sline[prod_i] = "PR_01"
+        if sline[prod_i] == "PR_16":
+            sline[acc_i] = "3110313"
+            sline[prod_i] = "PR_02"
+    elif sline[acc_i] == "3110207":
+        if sline[prod_i] == "PR_15":
+            sline[acc_i] = "3110311"
+            sline[prod_i] = "PR_01"
+        elif sline[prod_i] in PR_18:
+            sline[acc_i] = "3110402"
+            sline[prod_i] = "PR_05"
+    elif sline[acc_i] == "3110211" and sline[prod_i] in PR_18:
+        sline[acc_i] = "3110401"
+        sline[prod_i] = "PR_01"
+    elif sline[acc_i] == "3110212" and sline[prod_i] in PR_18:
+        sline[acc_i] = "3110402"
+        sline[prod_i] = "PR_01"
+    sline[cost_i] = "[None]"
     return ";".join(sline) + '\n'
 
 
 def cost(sourceline):
     sline = sourceline
-    if len(sline) == 12:
-        if sline[0] in ["4111002", "4111003"] and sline[2] in PR_18:  # Line 59-60
-            sline[2] = "PR_01"
-        elif sline[0] == "4111099" and sline[2] in PR_18:  # Line 61
-            sline[0] = "4111003"
-            sline[2] = "PR_05"
-        elif sline[0] == "4112002" and sline[2] == "PR_15":  # Line 62
-            sline[2] = "PR_01"
-        elif sline[0] == "4112003":
-            if sline[2] in ["PR_15", "PR_19"]:  # Line 63, 65
-                sline[2] = "PR_01"
-            elif sline[2] == "PR_16":  # Line 64
-                sline[0] = "4112004"
-                sline[2] = "PR_02"
-        elif sline[0] == "4120301" and sline[2] in PR_18:  # Line 66
-            sline[0] = "4111002"
-            sline[2] = "PR_01"
-        elif sline[0] == "4120302" and sline[2] in PR_18:  # Line 67
-            sline[0] = "4111003"
-            sline[2] = "PR_01"
-        elif sline[0] == "4120106":  # Line 69
-            sline[0] = "4110106"
-        elif sline[0] == "4120107":  # Line 70
-            sline[0] = "4110107"
-    elif len(sline) == 13:
-        if sline[1] in ["4111002", "4111003"] and sline[3] in PR_18:  # Line 59-60
-            sline[3] = "PR_01"
-        elif sline[1] == "4111099" and sline[3] in PR_18:  # Line 61
-            sline[1] = "4111003"
-            sline[3] = "PR_05"
-        elif sline[1] == "4112002" and sline[3] == "PR_15":  # Line 62
-            sline[3] = "PR_01"
-        elif sline[1] == "4112003":
-            if sline[3] in ["PR_15", "PR_19"]:  # Line 63, 65
-                sline[3] = "PR_01"
-            elif sline[3] == "PR_16":  # Line 64
-                sline[1] = "4112004"
-                sline[3] = "PR_02"
-        elif sline[1] == "4120301" and sline[3] in PR_18:  # Line 66
-            sline[1] = "4111002"
-            sline[3] = "PR_01"
-        elif sline[1] == "4120302" and sline[3] in PR_18:  # Line 67
-            sline[1] = "4111003"
-            sline[3] = "PR_01"
-        elif sline[1] == "4120106":  # Line 69
-            sline[1] = "4110106"
-        elif sline[1] == "4120107":  # Line 70
-            sline[1] = "4110107"
+    acc_i = 0
+    prod_i = 2
+    if len(sline) == 13:
+        acc_i = 1
+        prod_i = 2
+
+    if sline[acc_i] in ["4111002", "4111003"] and sline[prod_i] in PR_18:  # Line 59-60
+        sline[prod_i] = "PR_01"
+    elif sline[acc_i] == "4111099" and sline[prod_i] in PR_18:  # Line 61
+        sline[acc_i] = "4111003"
+        sline[prod_i] = "PR_05"
+    elif sline[acc_i] == "4112002" and sline[prod_i] == "PR_15":  # Line 62
+        sline[prod_i] = "PR_01"
+    elif sline[acc_i] == "4112003":
+        if sline[prod_i] in ["PR_15", "PR_19"]:  # Line 63, 65
+            sline[prod_i] = "PR_01"
+        elif sline[prod_i] == "PR_16":  # Line 64
+            sline[acc_i] = "4112004"
+            sline[prod_i] = "PR_02"
+    elif sline[acc_i] == "4120301" and sline[prod_i] in PR_18:  # Line 66
+        sline[acc_i] = "4111002"
+        sline[prod_i] = "PR_01"
+    elif sline[acc_i] == "4120302" and sline[prod_i] in PR_18:  # Line 67
+        sline[acc_i] = "4111003"
+        sline[prod_i] = "PR_01"
+    elif sline[acc_i] == "4120106":  # Line 69
+        sline[acc_i] = "4110106"
+    elif sline[acc_i] == "4120107":  # Line 70
+        sline[acc_i] = "4110107"
+
     return ";".join(sline) + "\n"
 
 
