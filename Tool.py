@@ -279,32 +279,22 @@ with open(sourceconverted, 'r', encoding="utf-8") as journal:
                 log.write(line + '\n')
         else:
             splline = line.strip().split(";")  # init variable to store splited line
-            if splline[0].isdigit():
-                if splline[0] == "3110101":
-                    line = acc3110101(splline)
-                elif splline[0] in acclist1:
-                    line = acc1conv(splline)
-                elif splline[0] in acclist2:
-                    line = acc2conv(splline)
-                elif splline[0] in acccostlist:
-                    line = cost(splline)
-                elif splline[0] in acclist3:
-                    line = acc3conv(splline)
-                elif splline[0] in accCR60:
-                    line = acccr60(splline)
-            elif not splline[0].isdigit():
-                if splline[1] == "3110101":
-                    line = acc3110101(splline)
-                elif splline[1] in acclist1:
-                    line = acc1conv(splline)
-                elif splline[1] in acclist2:
-                    line = acc2conv(splline)
-                elif splline[1] in acccostlist:
-                    line = cost(splline)
-                elif splline[1] in acclist3:
-                    line = acc3conv(splline)
-                elif splline[1] in accCR60:
-                    line = acccr60(splline)
+            if len(splline) == 12:
+                acc_index = 0
+            elif len(splline) == 13:
+                acc_index = 1
+            if splline[acc_index] == "3110101":
+                line = acc3110101(splline)
+            elif splline[acc_index] in acclist1:
+                line = acc1conv(splline)
+            elif splline[acc_index] in acclist2:
+                line = acc2conv(splline)
+            elif splline[acc_index] in acccostlist:
+                line = cost(splline)
+            elif splline[acc_index] in acclist3:
+                line = acc3conv(splline)
+            elif splline[acc_index] in accCR60:
+                line = acccr60(splline)
             convertedJournals.write(line)  # Write line to target .txt file
 convertedJournals.close()
 targetJournal = convert(convertPath)
