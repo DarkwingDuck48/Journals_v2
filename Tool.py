@@ -76,8 +76,9 @@ def acc3110101(sourceline):
     :return: Mapped line as string
     """
     sline = sourceline
-    prod_arr = PR_07 + PR_08 + PR_13 + ['PR_20', 'PR_67', "PR_17", "[None]"]
-    PR_01020304 = ["PR_01", "PR_02", "PR_03"] + PR_04
+    prod_arr = ['PR_20', 'PR_67', "PR_17", "[None]"]
+    PR_01020304 = ["PR_01", "PR_02", "PR_03"] + PR_04 + PR_07 + PR_08 + PR_13
+    PR_0203070813 = ["PR_02", "PR_03"]+ PR_07 + PR_08 + PR_13
     # index of dimensions
     prod_i = 2
     acc_i = 0
@@ -98,7 +99,7 @@ def acc3110101(sourceline):
         else:
             if sline[prod_i] == "PR_01":
                 sline[acc_i] = "3110124"
-            elif sline[prod_i] in ["PR_02", "PR_03"]:
+            elif sline[prod_i] in PR_0203070813:
                 sline[acc_i] = "3110121"
             elif sline[prod_i] in PR_04:
                 sline[acc_i] = "3110122"
