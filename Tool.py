@@ -124,30 +124,24 @@ def acc1conv(sourceline):
     :return: Mapped line as string
     """
     sline = sourceline
+    mkt_i = 4
+    acc_i = 0
+    cost_i = 7
+    if len(sline) == 13:
+        mkt_i = 5
+        acc_i = 1
+        cost_i = 8
     if len(sline) == 12:
-        if sline[4] in MK_03:  # Line 13-17
-            sline[0] = "3110001"
+        if sline[mkt_i] in MK_03:  # Line 13-17
+            sline[acc_i] = "3110001"
         else:
-            if sline[0] == "3110201":
-                sline[0] = "3110122"
-            elif sline[0] == "3110204":
-                sline[0] = "3110125"
+            if sline[acc_i] == "3110201":
+                sline[acc_i] = "3110122"
+            elif sline[acc_i] == "3110204":
+                sline[acc_i] = "3110125"
             else:
-                sline[0] = "3110124"
-        sline[7] = "[None]"
-
-    elif len(sline) == 13:
-        if sline[5] in MK_03:  # Line 13-17
-            sline[1] = "3110001"
-        else:
-            if sline[1] == "3110201":
-                sline[1] = "3110122"
-            elif sline[1] == "3110204":
-                sline[1] = "3110125"
-            else:
-                sline[1] = "3110124"
-        sline[8] = "[None]"
-
+                sline[acc_i] = "3110124"
+        sline[cost_i] = "[None]"
     return ";".join(sline) + '\n'
 
 
