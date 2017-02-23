@@ -77,7 +77,7 @@ def acc3110101(sourceline):
     """
     sline = sourceline
     prod_arr = ['PR_20', 'PR_67', "PR_17", "[None]"]
-    PR_01020304 = ["PR_01", "PR_02", "PR_03"] + PR_04 + PR_07 + PR_08 + PR_13
+    PR_01020304070813 = ["PR_01", "PR_02", "PR_03"] + PR_04 + PR_07 + PR_08 + PR_13
     PR_0203070813 = ["PR_02", "PR_03"]+ PR_07 + PR_08 + PR_13
     # index of dimensions
     prod_i = 2
@@ -91,9 +91,9 @@ def acc3110101(sourceline):
         cost_i = 8
     if sline[prod_i] in prod_arr:  # Line 2-8
             sline[acc_i] = "3110001"
-    elif sline[prod_i] in PR_01020304 and sline[mkt_i] in MK_03:  # Line 9-12
+    elif sline[prod_i] in PR_01020304070813 and sline[mkt_i] in MK_03:  # Line 9-12
             sline[acc_i] = "3110001"
-    elif sline[prod_i] in PR_01020304 and sline[mkt_i] in MK09:  # Line 18-41
+    elif sline[prod_i] in PR_01020304070813 and sline[mkt_i] in MK09:  # Line 18-41
         if sline[cost_i] in ["PP_02", "PP_03", "PP_04"]:
             sline[acc_i] = "3110111"
         else:
