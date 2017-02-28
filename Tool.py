@@ -192,8 +192,7 @@ def cost(sourceline):
     prod_i = 2
     if len(sline) == 13:
         acc_i = 1
-        prod_i = 2
-
+        prod_i = 3
     if sline[acc_i] in ["4111002", "4111003"] and sline[prod_i] in PR_18:  # Line 59-60
         sline[prod_i] = "PR_01"
     elif sline[acc_i] == "4111099" and sline[prod_i] in PR_18:  # Line 61
@@ -269,7 +268,7 @@ log = open('logs.txt', 'w', encoding="utf-8")
 
 # Open converted into txt journal
 starttime = time.time()
-with open(sourceconverted, 'r', encoding="utf-8") as journal:
+with open(sourceconverted, 'r') as journal:
     for line in journal:
         if line.isspace():
             convertedJournals.write(line)
