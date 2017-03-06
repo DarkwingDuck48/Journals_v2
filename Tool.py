@@ -2,7 +2,7 @@ import os
 import os.path
 import shutil
 import time
-
+# todo add multiselection files(dir)
 # Structures in HFM
 # MovProd
 PR_07 = ["PR_" + str(x) for x in range(28, 67) if x not in [28, 37, 42, 46, 53, 59]]
@@ -225,7 +225,10 @@ def cost(sourceline):
             sline[prod_i] = "PR_02"
     elif sline[acc_i] == "4120107":  # Line 70
         sline[acc_i] = "4110107"
-
+        if sline[prod_i] in ["PR_15", "PR_19", "PR_21", "PR_22"]:
+            sline[prod_i] = "PR_01"
+        elif sline[prod_i] in ["PR_16"]:
+            sline[prod_i] = "PR_02"
     return ";".join(sline) + "\n"
 
 
