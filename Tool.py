@@ -78,7 +78,7 @@ def acc3110101(sourceline):
     sline = sourceline
     prod_arr = ['PR_20', 'PR_67', "PR_17", "[None]"]
     PR_01020304070813 = ["PR_01", "PR_02", "PR_03"] + PR_04 + PR_07 + PR_08 + PR_13
-    PR_0203070813 = ["PR_02", "PR_03"]+ PR_07 + PR_08 + PR_13
+    PR_0203070813 = ["PR_02", "PR_03"] + PR_07 + PR_08 + PR_13
     # index of dimensions
     prod_i = 2
     acc_i = 0
@@ -262,56 +262,80 @@ def acccr60(sourceline):
             sline[8] = "CC10"
     return ";".join(sline)+"\n"
 
+def converjournal(converjournalname):
+    """
+
+    :param converjournalname: name of journal in txt
+    :return:
+    """
+    starttime = time.time()
+    sourceconverted = converjournalname
+    with open(sourceconverted, 'r') as journal:
+        for line in journal:
+            if line.isspace():
+                convertedJournals.write(line)
+            elif line.startswith("!"):
+                convertedJournals.write(line)
+                if line.startswith("!JOURNAL") or line.startswith("!Period"):
+                    log.write(line + '\n')
+            else:
+                splline = line.strip().split(";")  # init variable to store splited line
+                if len(splline) == 12:
+                    acc_index = 0
+                elif len(splline) == 13:
+                    acc_index = 1
+                if splline[acc_index] == "3110101":
+                    line = acc3110101(splline)
+                elif splline[acc_index] in acclist1:
+                    line = acc1conv(splline)
+                elif splline[acc_index] in acclist2:
+                    line = acc2conv(splline)
+                elif splline[acc_index] in acccostlist:
+                    line = cost(splline)
+                elif splline[acc_index] in acclist3:
+                    line = acc3conv(splline)
+                elif splline[acc_index] in accCR60:
+                    line = acccr60(splline)
+                convertedJournals.write(line)  # Write line to target .txt file
+    convertedJournals.close()
+    target_journal = convert(convertPath)
+    if os.path.isfile(target_journal):
+        os.remove(convertPath)
+    os.remove(sourceconverted)
+    log.close()
+    print("Done! Journal name - {}\n Time is - {:.3f}".format(os.path.basename(sourceconverted),
+                                                              time.time() - starttime))
+    return True
+
 # Get name Journal and check name
 
-sourcejournal = input("Enter name for source journal - ")+".jlf"
-while not os.path.isfile(sourcejournal):
-    print("Not file in directory with name " + sourcejournal)
-    sourcejournal = input("Enter name for source joutnal - ")+".jlf"
-sourcejournal = os.path.normpath(os.getcwd() + '//' + sourcejournal)
-sourceconverted = convert(sourcejournal)
+quest1 = int(input("Directory(1) or file(2)? "))
+log = open("logs.txt", "w", encoding="utf-8")
+if quest1 == 1:
+    soursedir = input("Enter directory name - ")  # Name of directory with journals to convert
+    while not os.path.isdir(soursedir):
+        print("No such directory {}".format(soursedir))
+        soursedir = input("Enter directory name - ")
+    soursedir = os.path.normpath(os.getcwd() + "//" + soursedir)  # path to directory with journals to convert
+    os.mkdir(soursedir+"//Converted")
+    alltime = time.time()
+    for name in os.listdir(soursedir):
+        if os.path.isfile(os.path.join(soursedir, name)):
+            convertName = name.split(".")[0]+str("_conv.txt")  # name of converted file
+            convertPath = os.path.normpath(soursedir + '//Converted//' + convertName)
 
-# Create tagret file and log
-convertName = input("Enter name for converted file - ") + '.txt'
-convertPath = os.path.normpath(os.getcwd() + '//' + convertName)
-
-convertedJournals = open(convertName, 'w', encoding="utf-8")
-log = open('logs.txt', 'w', encoding="utf-8")
-
-# Open converted into txt journal
-starttime = time.time()
-with open(sourceconverted, 'r') as journal:
-    for line in journal:
-        if line.isspace():
-            convertedJournals.write(line)
-        elif line.startswith("!"):
-            convertedJournals.write(line)
-            if line.startswith("!JOURNAL") or line.startswith("!Period"):
-                log.write(line + '\n')
-        else:
-            splline = line.strip().split(";")  # init variable to store splited line
-            if len(splline) == 12:
-                acc_index = 0
-            elif len(splline) == 13:
-                acc_index = 1
-            if splline[acc_index] == "3110101":
-                line = acc3110101(splline)
-            elif splline[acc_index] in acclist1:
-                line = acc1conv(splline)
-            elif splline[acc_index] in acclist2:
-                line = acc2conv(splline)
-            elif splline[acc_index] in acccostlist:
-                line = cost(splline)
-            elif splline[acc_index] in acclist3:
-                line = acc3conv(splline)
-            elif splline[acc_index] in accCR60:
-                line = acccr60(splline)
-            convertedJournals.write(line)  # Write line to target .txt file
-convertedJournals.close()
-targetJournal = convert(convertPath)
-if os.path.isfile(targetJournal):
-    os.remove(convertPath)
-os.remove(sourceconverted)
-log.close()
-
-print("Done! Time is - {:.3f}".format(time.time() - starttime))
+            convertedJournals = open(convertPath, 'w', encoding="utf-8")
+            converjournal(convert(os.path.join(soursedir, name)))
+    print("Done! Time is - {:.3f}".format(time.time() - alltime))
+elif quest1 == 2:
+    sourcejournal = input("Enter name for source journal - ")+".jlf"
+    while not os.path.isfile(sourcejournal):
+        print("Not file in directory with name " + sourcejournal)
+        sourcejournal = input("Enter name for source journal - ")+".jlf"
+    sourcejournal = os.path.normpath(os.getcwd() + '//' + sourcejournal)
+    sourceconverted = convert(sourcejournal)
+    # Create tagret file and log
+    convertName = input("Enter name for converted file - ") + '.txt'
+    convertPath = os.path.normpath(os.getcwd() + '//' + convertName)
+    convertedJournals = open(convertName, 'w', encoding="utf-8")
+    converjournal(sourceconverted)
