@@ -20,7 +20,7 @@ MK_03 = ['MK_04', 'MK_05', 'MK_06', 'MK_07', 'MK_08']
 acclist1 = ["3110201", "3110202", "3110203", "3110204", "3110205"]
 acclist2 = ["3110206", "3110207", "3110211", "3110212"]
 acccostlist = ["4111002", "4111003", "4111099", "4112002", "4112003", "4120301", "4120302", "4120102", "4120106",
-               "4120107"]
+               "4120107", "4110106"]
 acclist3 = ["4110105", "4110101", "4120101", "4110107"]
 accCR60 = {"4350301", "4350302",
            "4350601", "4350602", "4350603", "4350604",
@@ -212,8 +212,17 @@ def cost(sourceline):
     elif sline[acc_i] == "4120302" and sline[prod_i] in PR_18:  # Line 67
         sline[acc_i] = "4111003"
         sline[prod_i] = "PR_01"
-    elif sline[acc_i] == "4120106":  # Line 69
+    elif sline[acc_i] == "4120106" or sline[acc_i] == "4110106":  # Line 69
         sline[acc_i] = "4110106"
+        if sline[prod_i] in ["PR_15", "PR_19", "PR_21", "PR_22"]:
+            sline[prod_i] = "PR_01"
+        elif sline[prod_i] in ["PR_16"]:
+            sline[prod_i] = "PR_02"
+    elif sline[acc_i] == "4120102":
+        if sline[prod_i] in ["PR_15", "PR_19", "PR_21", "PR_22"]:
+            sline[prod_i] = "PR_01"
+        elif sline[prod_i] in ["PR_16"]:
+            sline[prod_i] = "PR_02"
     elif sline[acc_i] == "4120107":  # Line 70
         sline[acc_i] = "4110107"
 
