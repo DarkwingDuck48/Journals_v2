@@ -2,7 +2,6 @@ import os
 import os.path
 import shutil
 import time
-# todo add multiselection files(dir)
 # Structures in HFM
 # MovProd
 PR_07 = ["PR_" + str(x) for x in range(28, 67) if x not in [28, 37, 42, 46, 53, 59]]
@@ -262,6 +261,7 @@ def acccr60(sourceline):
             sline[8] = "CC10"
     return ";".join(sline)+"\n"
 
+
 def converjournal(converjournalname):
     """
 
@@ -321,7 +321,8 @@ if quest1 == 1:
     alltime = time.time()
     for name in os.listdir(soursedir):
         if os.path.isfile(os.path.join(soursedir, name)):
-            convertName = name.split(".")[0]+str("_conv.txt")  # name of converted file
+            # noinspection PyTypeChecker
+            convertName = name.split(".")[0]+"_conv.txt"  # name of converted file
             convertPath = os.path.normpath(soursedir + '//Converted//' + convertName)
 
             convertedJournals = open(convertPath, 'w', encoding="utf-8")
