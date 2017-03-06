@@ -78,7 +78,7 @@ def acc3110101(sourceline):
     sline = sourceline
     prod_arr = ['PR_20', 'PR_67', "PR_17", "[None]"]
     PR_01020304070813 = ["PR_01", "PR_02", "PR_03"] + PR_04 + PR_07 + PR_08 + PR_13
-    PR_0203070813 = ["PR_02", "PR_03"]+ PR_07 + PR_08 + PR_13
+    PR_0203070813 = ["PR_02", "PR_03"] + PR_07 + PR_08 + PR_13
     # index of dimensions
     prod_i = 2
     acc_i = 0
@@ -310,6 +310,7 @@ def converjournal(converjournalname):
 # Get name Journal and check name
 
 quest1 = int(input("Directory(1) or file(2)? "))
+log = open("logs.txt", "w", encoding="utf-8")
 if quest1 == 1:
     soursedir = input("Enter directory name - ")  # Name of directory with journals to convert
     while not os.path.isdir(soursedir):
@@ -317,15 +318,15 @@ if quest1 == 1:
         soursedir = input("Enter directory name - ")
     soursedir = os.path.normpath(os.getcwd() + "//" + soursedir)  # path to directory with journals to convert
     os.mkdir(soursedir+"//Converted")
+    alltime = time.time()
     for name in os.listdir(soursedir):
         if os.path.isfile(os.path.join(soursedir, name)):
             convertName = name.split(".")[0]+str("_conv.txt")  # name of converted file
-            log = open("log.txt", "w", encoding="utf-8")
             convertPath = os.path.normpath(soursedir + '//Converted//' + convertName)
 
             convertedJournals = open(convertPath, 'w', encoding="utf-8")
             converjournal(convert(os.path.join(soursedir, name)))
-
+    print("Done! Time is - {:.3f}".format(time.time() - alltime))
 elif quest1 == 2:
     sourcejournal = input("Enter name for source journal - ")+".jlf"
     while not os.path.isfile(sourcejournal):
@@ -336,6 +337,5 @@ elif quest1 == 2:
     # Create tagret file and log
     convertName = input("Enter name for converted file - ") + '.txt'
     convertPath = os.path.normpath(os.getcwd() + '//' + convertName)
-
     convertedJournals = open(convertName, 'w', encoding="utf-8")
     converjournal(sourceconverted)
